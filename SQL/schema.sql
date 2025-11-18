@@ -146,10 +146,14 @@ CREATE TABLE Medication_dispensed(
 );
 
 CREATE TABLE Medication(
-    name TEXT PRIMARY KEY,
-    quantity_ordered INTEGER,
-    quantity_in_stock INTEGER,
-    location TEXT
+    name               TEXT PRIMARY KEY,
+    quantity_ordered   INTEGER NOT NULL,
+    quantity_in_stock  INTEGER NOT NULL,
+    location           TEXT,
+    
+    CHECK (quantity_in_stock > 0),
+    CHECK (quantity_ordered > 0),
+    CHECK (quantity_ordered < quantity_in_stock)
 );
 
 CREATE TABLE Manages(
