@@ -142,9 +142,9 @@ VALUES
 
 INSERT INTO Medication(name, quantity_ordered , quantity_in_stock , location)
 VALUES
-('Atorvastatin',200,150,'Shelf A1'),
-('Lisinopril',300,220,'Shelf A2'),
-   ('Amoxicillin',150,80,'Fridge F1')
+('Atorvastatin',150,200,'Shelf A1'),
+('Lisinopril',220,300,'Shelf A2'),
+   ('Amoxicillin',80,150,'Fridge F1')
 ;
 
 

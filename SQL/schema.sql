@@ -179,3 +179,21 @@ CREATE TABLE Contains(
         REFERENCES Medication(name)
 );
 
+CREATE TABLE IF NOT EXISTS User_Account (
+    user_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    username       TEXT NOT NULL UNIQUE,
+    password_hash  TEXT NOT NULL,
+    role           TEXT NOT NULL CHECK (role IN ('patient','doctor','pharmacist','admin')),
+
+    patient_ssn    TEXT,
+    patient_name   TEXT,
+    doctor_id      INTEGER,
+    pharmacist_id  INTEGER,
+
+    FOREIGN KEY (patient_ssn, patient_name)
+        REFERENCES Patient(ssn, name),
+    FOREIGN KEY (doctor_id)
+        REFERENCES Doctor(id),
+    FOREIGN KEY (pharmacist_id)
+        REFERENCES Pharmacist(id)
+);
