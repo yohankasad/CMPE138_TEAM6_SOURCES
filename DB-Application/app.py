@@ -168,7 +168,97 @@ def admin_menu(conn, user):
 
 
 def doctor_menu(conn, user):
-    print("\n--- Doctor Menu (coming soon) ---\n")
+    doctor_id = user["doctor_id"]
+
+    while True:
+        print(f"""
+==== DOCTOR MENU (Dr. {user['username']}) ====
+1. View My Appointments
+2. Create Prescription
+3. View Prescriptions I Issued
+0. Logout
+""")
+
+        choice = input("Select an option: ").strip()
+
+        if choice == "1":
+            view_doctor_appointments(conn, doctor_id)
+
+        elif choice == "2":
+            create_prescription(conn, doctor_id)
+
+        elif choice == "3":
+            view_prescriptions_by_doctor(conn, doctor_id)
+
+        elif choice == "0":
+            print("Logging out...\n")
+            break
+
+        else:
+            print("Invalid choice.\n")
+#Doc Appointment
+def view_doctor_appointments(conn, doctor_id):
+    print("\n--- My Appointments ---")
+    q = """
+        SELECT A.appointment_id, A.scheduled_datetime,
+               P.name AS patient_name
+        FROM Appointment A
+        JOIN Patient P ON A.patient_ssn = P.ssn
+        WHERE A.doctor_id = ?
+        ORDER BY A.scheduled_datetime;
+    """
+    rows = conn.execute(q, (doctor_id,)).fetchall()
+
+    if not rows:
+        print("No appointments found.\n")
+        return
+
+    for r in rows:
+        print(f"{r['appointment_id']} | {r['scheduled_datetime']} | {r['patient_name']}")
+    print()
+
+#create prescription
+
+def create_prescription(conn, doctor_id):
+    print("\n--- Create Prescription ---")
+    patient_ssn = input("Patient SSN: ").strip()
+    patient_name = conn.execute("SELECT name FROM Patient WHERE ssn = ?", (patient_ssn,)).fetchone()
+
+    if not patient_name:
+        print("No such patient.\n")
+        return
+
+    dosage = input("Dosage Instructions: ").strip()
+
+    conn.execute("""
+        INSERT INTO Prescription (prescriber_id, prescripted_patient_ssn, prescripted_patient_name, dosage)
+        VALUES (?, ?, ?, ?);
+    """, (doctor_id, patient_ssn, patient_name["name"], dosage))
+
+    conn.commit()
+    print("Prescription created.\n")
+
+#view precscription
+
+def view_prescriptions_by_doctor(conn, doctor_id):
+    print("\n--- Prescriptions I Issued ---")
+
+    q = """
+        SELECT prescription_id, prescripted_patient_name, dosage
+        FROM Prescription
+        WHERE prescriber_id = ?
+        ORDER BY prescription_id DESC;
+    """
+
+    rows = conn.execute(q, (doctor_id,)).fetchall()
+
+    if not rows:
+        print("No prescriptions issued.\n")
+        return
+
+    for r in rows:
+        print(f"{r['prescription_id']} | {r['prescripted_patient_name']} | {r['dosage']}")
+    print()
 
 
 def patient_menu(conn, user):
