@@ -188,3 +188,39 @@ VALUES
 (2,'Lisinopril'),
 (3,'Amoxicillin')
 ;
+
+-- Just An Admin user 
+INSERT INTO User_Account (username, password_hash, role)
+VALUES (
+    'admin',
+    '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', -- admin123
+    'admin'
+);
+
+-- Doctor Alice Heart 1
+INSERT INTO User_Account (username, password_hash, role, doctor_id)
+VALUES (
+    'dralice',
+    'c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98', -- doc123
+    'doctor',
+    1
+);
+
+-- Patient  John Doe (SSN 111-22-3333)
+INSERT INTO User_Account (username, password_hash, role, patient_ssn, patient_name)
+VALUES (
+    'johndoe',
+    'd4587ea9ead060c13fd994f21ecfa7926272a78854a2c20136b10a3c9e53e71e', -- patient123
+    'patient',
+    '111-22-3333',
+    'John Doe'
+);
+
+-- Pharmacist Alice Pharmacist 1
+INSERT INTO User_Account (username, password_hash, role, pharmacist_id)
+VALUES (
+    'alicepharm',
+    '47a0df34426c6c34a4ee69b75e8a5c31872cddc43df8fbe5d84a020ca5a3c623', -- pharm123
+    'pharmacist',
+    1
+);
