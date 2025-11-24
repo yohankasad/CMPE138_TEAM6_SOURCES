@@ -140,6 +140,7 @@ def admin_menu(conn, user):
 3. Create Appointment
 4. View Patient Prescriptions
 5. View Medication Inventory
+6. List Doctor
 9. Register New User
 0. Logout
 """)
@@ -157,6 +158,8 @@ def admin_menu(conn, user):
             list_medications(conn)
         elif choice == "9":
             register_user(conn)
+        elif choice == "6":
+            list_doctors(conn)
         elif choice == "0":
             print("Logging out...\n")
             break
@@ -222,6 +225,20 @@ def create_appointment(conn):
         print("Appointment created successfully.\n")
     except sqlite3.IntegrityError as e:
         print("Error:", e)
+
+#list doctor
+
+def list_doctors(conn):
+    print("\n--- Doctor List ---")
+    rows = conn.execute("""
+        SELECT id, name, license_number, department_name
+        FROM Doctor
+        ORDER BY name;
+    """).fetchall()
+
+    for r in rows:
+        print(f"ID: {r['id']} | {r['name']} | License: {r['license_number']} | Dept: {r['department_name']}")
+    print()
 
 
 #   PRESCRIPTIONS
