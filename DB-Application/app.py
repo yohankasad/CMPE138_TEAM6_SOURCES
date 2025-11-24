@@ -230,11 +230,13 @@ def list_prescriptions_for_patient(conn):
     ssn = input("Enter patient SSN: ").strip()
 
     q = """
-        SELECT Pr.prescription_id, Pr.date, D.name AS doctor_name
+        SELECT Pr.prescription_id,
+               Pr.dosage,
+               D.name AS doctor_name
         FROM Prescription Pr
-        JOIN Doctor D ON Pr.doctor_id = D.id
-        WHERE Pr.patient_ssn = ?
-        ORDER BY Pr.date DESC;
+        JOIN Doctor D ON Pr.prescriber_id = D.id
+        WHERE Pr.prescripted_patient_ssn = ?
+        ORDER BY Pr.prescription_id DESC;
     """
 
     rows = conn.execute(q, (ssn,)).fetchall()
@@ -244,8 +246,9 @@ def list_prescriptions_for_patient(conn):
         return
 
     for r in rows:
-        print(f"Prescription #{r['prescription_id']}  |  {r['date']}  | Dr. {r['doctor_name']}")
+        print(f"Prescription #{r['prescription_id']}  |  {r['dosage']}  | Dr. {r['doctor_name']}")
     print()
+
 
 
 #   MEDICATION INVENTORY
