@@ -206,7 +206,7 @@ def list_appointments(conn):
     """
     rows = conn.execute(q).fetchall()
     for r in rows:
-        print(f"{r['appointment_id']:3} | {r['scheduled_datetime']} | {r['patient_name']} | Dr. {r['doctor_name']}")
+        print(f"{r['appointment_id']:3} | {r['scheduled_datetime']} | {r['patient_name']} | {r['doctor_name']}")
     print()
 
 
