@@ -83,7 +83,7 @@ CREATE TABLE Patient_Healthcare_Insurance(
 CREATE TABLE Prescription (
     prescription_id INTEGER PRIMARY KEY AUTOINCREMENT, 
     prescriber_id INTEGER NOT NULL, -- prescribes relationship 
-    policy_id INTEGER NOT NULL,    -- this one seems weird on the paid by relation side. Our er diagram doesnt match this as 1 to m basically would have foreign attribute on m side
+    policy_id INTEGER,    -- this one seems weird on the paid by relation side. Our er diagram doesnt match this as 1 to m basically would have foreign attribute on m side
     prescripted_patient_ssn TEXT NOT NULL,
     prescripted_patient_name TEXT NOT NULL, -- assigned to relationship
 
