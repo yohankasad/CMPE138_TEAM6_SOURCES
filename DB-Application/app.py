@@ -15,13 +15,13 @@ def get_connection():
 
 
 def hash_password(plain: str) -> str:
-    """Return SHA-256 hash of password."""
     return hashlib.sha256(plain.encode("utf-8")).hexdigest()
 
 
 def get_user_by_username(conn, username):
     q = "SELECT * FROM User_Account WHERE username = ?;"
     return conn.execute(q, (username,)).fetchone()
+
 
 
 def register_user(conn):
@@ -134,31 +134,31 @@ def run_role_menu(conn, user):
 def admin_menu(conn, user):
     while True:
         print(f"""
-==== ADMIN MENU (Logged in as {user['username']}) ====
-1. List Patients
-2. List Appointments
-3. Create Appointment
-4. View Patient Prescriptions
-5. View Medication Inventory
-6. List Doctors
-7. List Departments
-8. View Department Details
-9. Create Department
-10. View Specialist Doctors
-11. View Primary Care Doctors
-12. List Pharmacies
-13. View Pharmacy Details
-14. Create Pharmacy
-15. View Pharmacist Details
-16. View Prescription Medications
-17. Add Medication to Prescription
-18. Remove Medication from Prescription
-19. Assign Primary Care Doctor to Patient
-20. View Patient's Primary Care Doctor
-21. Register New User
-22. System Statistics
-0. Logout
-""")
+        ==== ADMIN MENU (Logged in as {user['username']}) ====
+        1. List Patients
+        2. List Appointments
+        3. Create Appointment
+        4. View Patient Prescriptions
+        5. View Medication Inventory
+        6. List Doctors
+        7. List Departments
+        8. View Department Details
+        9. Create Department
+        10. View Specialist Doctors
+        11. View Primary Care Doctors
+        12. List Pharmacies
+        13. View Pharmacy Details
+        14. Create Pharmacy
+        15. View Pharmacist Details
+        16. View Prescription Medications
+        17. Add Medication to Prescription
+        18. Remove Medication from Prescription
+        19. Assign Primary Care Doctor to Patient
+        20. View Patient's Primary Care Doctor
+        21. Register New User
+        22. System Statistics
+        0. Logout
+        """)
         choice = input("Select an option: ").strip()
 
         if choice == "1":
@@ -217,12 +217,12 @@ def doctor_menu(conn, user):
 
     while True:
         print(f"""
-==== DOCTOR MENU (Dr. {user['username']}) ====
-1. View My Appointments
-2. Create Prescription
-3. View Prescriptions I Issued
-0. Logout
-""")
+            ==== DOCTOR MENU (Dr. {user['username']}) ====
+            1. View My Appointments
+            2. Create Prescription
+            3. View Prescriptions I Issued
+            0. Logout
+            """)
 
         choice = input("Select an option: ").strip()
 
@@ -312,18 +312,18 @@ def patient_menu(conn, user):
 
     while True:
         print(f"""
-==== PATIENT MENU (Logged in as {user['username']}) ====
-1. View My Personal Information
-2. View My Appointments
-3. View My Prescriptions
-4. View Available Doctors
-5. View My Insurance Information
-6. View My Primary Care Doctor
-7. View Medications in Prescription
-8. Request New Appointment
-9. View Appointment History
-0. Logout
-""")
+        ==== PATIENT MENU (Logged in as {user['username']}) ====
+        1. View My Personal Information
+        2. View My Appointments
+        3. View My Prescriptions
+        4. View Available Doctors
+        5. View My Insurance Information
+        6. View My Primary Care Doctor
+        7. View Medications in Prescription
+        8. Request New Appointment
+        9. View Appointment History
+        0. Logout
+        """)
 
         choice = input("Select an option: ").strip()
 
@@ -818,17 +818,35 @@ def create_appointment(conn):
     doctor_id = input("Doctor ID: ").strip()
     dt = input("DateTime (YYYY-MM-DD HH:MM:SS): ").strip()
 
+    cur = conn.execute(
+        "SELECT name FROM Patient WHERE ssn = ?;",
+        (ssn,)
+    )
+    row = cur.fetchone()
+    if row is None:
+        print("Error: No patient found with that SSN.\n")
+        return
+
+    patient_name = row[0]
+
     try:
-        conn.execute("""
-            INSERT INTO Appointment (patient_ssn, doctor_id, scheduled_datetime)
-            VALUES (?, ?, ?);
-        """, (ssn, doctor_id, dt))
+        conn.execute(
+            """
+            INSERT INTO Appointment (
+                patient_ssn,
+                patient_name,
+                doctor_id,
+                scheduled_datetime
+            )
+            VALUES (?, ?, ?, ?);
+            """,
+            (ssn, patient_name, doctor_id, dt),
+        )
         conn.commit()
         print("Appointment created successfully.\n")
     except sqlite3.IntegrityError as e:
         print("Error:", e)
 
-#list doctor
 
 def list_doctors(conn):
     print("\n--- Doctor List ---")
@@ -843,7 +861,6 @@ def list_doctors(conn):
     print()
 
 
-#   PRESCRIPTIONS
 def list_prescriptions_for_patient(conn):
     print("\n--- Patient Prescriptions ---")
     ssn = input("Enter patient SSN: ").strip()
@@ -870,7 +887,6 @@ def list_prescriptions_for_patient(conn):
 
 
 
-#   MEDICATION INVENTORY
 def list_medications(conn):
     print("\n--- Medication Inventory ---")
     rows = conn.execute("""
@@ -1314,31 +1330,15 @@ def view_assigned_primary_care(conn):
 def view_system_statistics(conn):
     print("\n--- System Statistics ---")
     
-    # Count patients
     patients_count = conn.execute("SELECT COUNT(*) as count FROM Patient;").fetchone()['count']
-    
-    # Count doctors
     doctors_count = conn.execute("SELECT COUNT(*) as count FROM Doctor;").fetchone()['count']
-    
-    # Count appointments
     appointments_count = conn.execute("SELECT COUNT(*) as count FROM Appointment;").fetchone()['count']
-    
-    # Count prescriptions
     prescriptions_count = conn.execute("SELECT COUNT(*) as count FROM Prescription;").fetchone()['count']
-    
-    # Count departments
     departments_count = conn.execute("SELECT COUNT(*) as count FROM Department;").fetchone()['count']
-    
-    # Count pharmacies
     pharmacies_count = conn.execute("SELECT COUNT(*) as count FROM Pharmacy;").fetchone()['count']
-    
-    # Count pharmacists
     pharmacists_count = conn.execute("SELECT COUNT(*) as count FROM Pharmacist;").fetchone()['count']
-    
-    # Count medications
     medications_count = conn.execute("SELECT COUNT(*) as count FROM Medication;").fetchone()['count']
     
-    # Count users
     users_count = conn.execute("SELECT COUNT(*) as count FROM User_Account;").fetchone()['count']
     
     print(f"\n{'Entity':<25} | {'Count':<10}")
@@ -1361,13 +1361,13 @@ def main():
     with get_connection() as conn:
         while True:
             print("""
-===========================
-     Welcome
-===========================
-1. Login
-2. Register
-0. Exit
-""")
+            ===========================
+                Welcome
+            ===========================
+            1. Login
+            2. Register
+            0. Exit
+            """)
             choice = input("Select an option: ").strip()
 
             if choice == "1":
