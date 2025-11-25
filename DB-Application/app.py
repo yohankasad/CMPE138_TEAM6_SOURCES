@@ -682,12 +682,33 @@ def dispense_prescription(conn, pharmacist_id):
         return
 
     try:
+        # Begin transaction
+        conn.execute("BEGIN;")
+        # Insert into Medication_dispensed
         conn.execute("""
             INSERT INTO Medication_dispensed (prescription_id, dispenser_id)
             VALUES (?, ?);
         """, (prescription_id, pharmacist_id))
+
+        # Get all medications in the prescription
+        meds = conn.execute("""
+            SELECT medication_name FROM Contains WHERE prescription_id = ?;
+        """, (prescription_id,)).fetchall()
+        if not meds:
+            raise Exception("No medications linked to this prescription.")
+
+        # Decrement stock for each medication
+        for med in meds:
+            # Check current stock
+            stock_row = conn.execute("SELECT quantity_in_stock FROM Medication WHERE name = ?;", (med['medication_name'],)).fetchone()
+            if not stock_row or stock_row['quantity_in_stock'] <= 0:
+                raise Exception(f"Not enough stock for medication: {med['medication_name']}")
+            conn.execute("""
+                UPDATE Medication SET quantity_in_stock = quantity_in_stock - 1 WHERE name = ?;
+            """, (med['medication_name'],))
+
         conn.commit()
-        print(f"Prescription {prescription_id} dispensed successfully.\n")
+        print(f"Prescription {prescription_id} dispensed and medication stock updated.\n")
     except Exception as e:
         conn.rollback()
         print(f"Error dispensing prescription: {e}\n")
