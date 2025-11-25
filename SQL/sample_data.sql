@@ -1,6 +1,4 @@
--- =====================
---   sample data   cmpe 138  team6
--- =====================
+--   SJSU CMPE 138 FALL 2025 TEAM6 
 
 PRAGMA foreign_keys = ON ;
 
