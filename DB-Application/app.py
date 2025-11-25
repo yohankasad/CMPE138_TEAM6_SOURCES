@@ -1,3 +1,4 @@
+#SJSU CMPE 138 FALL 2025 TEAM6 
 import sqlite3
 import hashlib
 from pathlib import Path
@@ -1387,3 +1388,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
