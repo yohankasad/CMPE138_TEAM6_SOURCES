@@ -23,7 +23,6 @@ def get_user_by_username(conn, username):
     return conn.execute(q, (username,)).fetchone()
 
 
-
 def register_user(conn):
     print("\n--- Register New User ---")
     username = input("Choose username: ").strip()
@@ -595,14 +594,14 @@ def pharmacist_menu(conn, user):
 
     while True:
         print(f"""
-==== PHARMACIST MENU (Logged in as {user['username']}) ====
-1. View Available Medications
-2. View Pending Prescriptions
-3. Dispense a Prescription
-4. View Medication Inventory
-5. Update Medication Stock
-0. Logout
-""")
+        ==== PHARMACIST MENU (Logged in as {user['username']}) ====
+        1. View Available Medications
+        2. View Pending Prescriptions
+        3. Dispense a Prescription
+        4. View Medication Inventory
+        5. Update Medication Stock
+        0. Logout
+        """)
 
         choice = input("Select an option: ").strip()
 
