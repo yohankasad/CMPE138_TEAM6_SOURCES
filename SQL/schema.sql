@@ -1,3 +1,4 @@
+--SJSU CMPE 138 FALL 2025 TEAM6 
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE Department(
